@@ -78,6 +78,10 @@ Prompt handling is a first-class design concern in this repository.
 - Prefer separate prompt files over large inline string literals.
 - Keep prompts close to the script that uses them.
 - Make prompt files easy to diff and easy to refine independently from code.
+- Use Markdown prompt files with optional frontmatter for required variables:
+  - `required_variables` lists every `{{placeholder}}` the prompt expects.
+  - `npm run validate:prompts` checks `menton/*/prompts/*.md` for missing prompt files and placeholder/frontmatter drift.
+  - Spikes may use the same convention, but the validator is scoped to production-style `menton/` scripts by default.
 - When prompt structure, loading, composition, or templating becomes a recurring pattern, document the chosen approach in an ADR.
 - If a prompt-writing or prompt-chaining lesson is broadly reusable, add it to the `pi-mentor` skill.
 
@@ -87,6 +91,13 @@ Prompt handling is a first-class design concern in this repository.
 - Spikes are allowed to be rough, but they should still be understandable and isolated.
 - If a spike leads to a reusable pattern, promote that learning into `.specs`, an ADR, the `pi-mentor` skill, or the production structure under `menton/`.
 - Do not leave important discoveries trapped in a spike.
+
+## Run Artifacts
+
+- Volatile run outputs belong under `artifacts/<script-name>/<run-id>/`.
+- Use artifact folders for rendered prompts, raw model outputs, summaries, manifests, and retry notes.
+- `artifacts/` is ignored by git; commit stable examples and fixtures under each script's `assets/` folder instead.
+- Production-style examples should write at least a small manifest so a future agent can inspect what happened without guessing.
 
 ## pi-mentor Skill
 
@@ -114,6 +125,12 @@ When something useful is discovered, decide documentation targets like this:
 - `ADR only`: structural or architectural decision.
 - `pi-mentor only`: execution, prompting, decomposition, or scripting lesson.
 - `ADR + pi-mentor`: a durable structural decision with operational consequences for how agents should work.
+
+Short examples:
+
+- `ADR only`: deciding that all volatile run outputs live under `artifacts/<script-name>/<run-id>/` and are ignored by git. Record the durable repository convention in `.specs/adr/`.
+- `pi-mentor only`: learning that a retry prompt should include the previous error, the exact command, and the expected output shape. Add the reusable execution lesson to `skills/pi-mentor/SKILL.md`.
+- `ADR + pi-mentor`: adopting Markdown prompt files with explicit `{{variable}}` placeholders. The file layout belongs in `.specs/adr/`; the practical prompt-writing rule belongs in the skill.
 
 ## Expected Quality Bar
 
