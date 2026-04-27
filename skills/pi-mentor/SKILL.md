@@ -79,6 +79,58 @@ Do not bury step-specific details in the system prompt when they belong to the c
 - Prefer deterministic tool steps before or after Pi when they reduce ambiguity.
 - Keep data transformations inspectable.
 - Preserve useful intermediate outputs when they help retries, debugging, or auditing.
+- Write rendered prompts, raw model output, final output, and a small manifest under `artifacts/<script-name>/<run-id>/` when the run has multiple stages or may need retry/debugging.
+
+## Concrete examples
+
+### Decompose broad work into inspectable stages
+
+Before:
+
+```text
+Read this repository and tell me what to improve.
+```
+
+After:
+
+```text
+Stage 1: list candidate files with `fd` or `find` and save the list.
+Stage 2: ask Pi to summarize only those files into `artifacts/<script>/<run>/raw-summary.md`.
+Stage 3: ask Pi to turn that summary into three prioritized actions.
+Stage 4: validate each action with deterministic commands before editing.
+```
+
+Why it helps: weaker models get a smaller prompt at each step, and humans can inspect the intermediate file list and raw summary before trusting the final recommendation.
+
+### Make retry prompts carry the failed boundary
+
+Before:
+
+```text
+Try again, the command failed.
+```
+
+After:
+
+```text
+The command failed:
+
+command: npm run validate:prompts
+exit: 1
+stderr: FAIL prompt-layout-example/task.md: {{input}} is not listed in required_variables
+
+Fix only the prompt metadata or placeholder text needed to make the validator pass. Do not rewrite the script.
+```
+
+Why it helps: the retry prompt includes the exact failed command, the useful error, and a narrow repair scope.
+
+### Split prompt text from code when it hides the runbook
+
+Before: a `main.mjs` file contains a 100-line inline system prompt followed by two short commands.
+
+After: `main.mjs` shows the command sequence and loads `prompts/system.md` plus `prompts/review.md` with explicit variables.
+
+Why it helps: the script stays readable like a shell runbook, while prompt edits remain easy to diff and validate.
 
 ## Prefer shallow patterns
 

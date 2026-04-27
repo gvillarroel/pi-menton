@@ -1,0 +1,15 @@
+{
+  "name": "pi-menton",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "doctor": "node tools/doctor.mjs",
+    "scaffold": "node tools/scaffold-menton.mjs",
+    "validate:prompts": "node tools/validate-prompts.mjs",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "zx": "^8.8.0"
+  }
+}
